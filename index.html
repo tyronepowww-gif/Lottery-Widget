@@ -1,0 +1,2304 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  />
+  <meta name="theme-color" content="#071018" />
+  <title>Zuno PL 200 — Lightning Strike Calculator</title>
+
+  <style>
+    :root {
+      --bg: #071018;
+      --bg-deep: #03070b;
+      --panel: rgba(11, 25, 35, 0.94);
+      --panel-2: rgba(15, 38, 50, 0.96);
+      --line: rgba(91, 222, 255, 0.2);
+      --line-soft: rgba(255, 255, 255, 0.08);
+      --cyan: #55e8ff;
+      --cyan-2: #17bcd9;
+      --green: #7cf5ad;
+      --yellow: #ffe36c;
+      --orange: #ffad5b;
+      --red: #ff6d7e;
+      --purple: #b18cff;
+      --text: #eefaff;
+      --muted: #9db5c0;
+      --dark-text: #061015;
+      --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+      --radius: 18px;
+      --radius-sm: 12px;
+      --max-width: 1180px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      background:
+        radial-gradient(circle at 15% -10%, rgba(30, 192, 226, 0.18), transparent 30%),
+        radial-gradient(circle at 90% 0%, rgba(177, 140, 255, 0.12), transparent 28%),
+        linear-gradient(165deg, var(--bg) 0%, var(--bg-deep) 100%);
+      color: var(--text);
+      font-family:
+        Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+      line-height: 1.45;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .app-shell {
+      width: min(100%, var(--max-width));
+      margin: 0 auto;
+      padding: max(18px, env(safe-area-inset-top)) 16px
+        max(36px, env(safe-area-inset-bottom));
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 24px;
+      margin-bottom: 18px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background:
+        linear-gradient(125deg, rgba(20, 61, 77, 0.85), rgba(9, 17, 27, 0.96)),
+        var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      top: -90px;
+      right: -90px;
+      width: 240px;
+      height: 240px;
+      border: 1px solid rgba(85, 232, 255, 0.2);
+      border-radius: 50%;
+      box-shadow:
+        0 0 0 24px rgba(85, 232, 255, 0.04),
+        0 0 0 48px rgba(85, 232, 255, 0.025);
+      pointer-events: none;
+    }
+
+    .brand-row {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+
+    .brand-kicker {
+      margin: 0 0 4px;
+      color: var(--cyan);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin-bottom: 8px;
+      font-size: clamp(1.65rem, 5vw, 2.65rem);
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+    }
+
+    h2 {
+      margin-bottom: 6px;
+      font-size: 1.18rem;
+      letter-spacing: -0.02em;
+    }
+
+    h3 {
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+    }
+
+    .hero-copy,
+    .section-note,
+    .fine-print,
+    .score-explanation,
+    .notice-text {
+      color: var(--muted);
+    }
+
+    .hero-copy {
+      max-width: 720px;
+      margin-bottom: 0;
+      font-size: 0.96rem;
+    }
+
+    .bolt-badge {
+      display: grid;
+      width: 58px;
+      height: 58px;
+      flex: 0 0 auto;
+      place-items: center;
+      border: 1px solid rgba(255, 227, 108, 0.56);
+      border-radius: 16px;
+      color: var(--yellow);
+      font-size: 2rem;
+      background: rgba(255, 227, 108, 0.08);
+      box-shadow: 0 0 24px rgba(255, 227, 108, 0.12);
+    }
+
+    .principle {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      margin-top: 20px;
+      padding: 14px;
+      border-left: 3px solid var(--cyan);
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.18);
+    }
+
+    .principle strong {
+      color: var(--cyan);
+    }
+
+    .top-actions,
+    .button-row,
+    .generator-controls,
+    .tab-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .top-actions {
+      margin: 18px 0;
+    }
+
+    .btn {
+      min-height: 46px;
+      padding: 11px 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      color: var(--text);
+      font-weight: 800;
+      letter-spacing: 0.01em;
+      background: rgba(20, 45, 59, 0.85);
+      transition:
+        transform 0.16s ease,
+        background 0.16s ease,
+        border-color 0.16s ease,
+        box-shadow 0.16s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(85, 232, 255, 0.65);
+      background: rgba(28, 67, 83, 0.94);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary {
+      color: var(--dark-text);
+      border-color: var(--cyan);
+      background: linear-gradient(135deg, var(--cyan), #b3f8ff);
+      box-shadow: 0 8px 24px rgba(85, 232, 255, 0.16);
+    }
+
+    .btn-primary:hover {
+      border-color: #d8fdff;
+      background: linear-gradient(135deg, #8cf0ff, #dcfdff);
+    }
+
+    .btn-warning {
+      color: #2c1c00;
+      border-color: var(--yellow);
+      background: linear-gradient(135deg, var(--yellow), #fff3ad);
+    }
+
+    .btn-danger {
+      border-color: rgba(255, 109, 126, 0.58);
+      background: rgba(143, 34, 52, 0.28);
+    }
+
+    .btn-small {
+      min-height: 36px;
+      padding: 8px 10px;
+      font-size: 0.82rem;
+    }
+
+    .grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid-2 {
+      grid-template-columns: 1fr;
+    }
+
+    .grid-3 {
+      grid-template-columns: 1fr;
+    }
+
+    .panel {
+      padding: 18px;
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(145deg, rgba(19, 42, 55, 0.75), rgba(8, 18, 27, 0.93)),
+        var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .panel.highlight {
+      border-color: rgba(85, 232, 255, 0.34);
+    }
+
+    .panel-head {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 14px;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .section-note {
+      margin-bottom: 0;
+      font-size: 0.86rem;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .metric {
+      min-width: 0;
+      padding: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: var(--radius-sm);
+      background: rgba(0, 0, 0, 0.15);
+    }
+
+    .metric-label {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--muted);
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .metric-value {
+      display: block;
+      overflow-wrap: anywhere;
+      color: var(--text);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+
+    .metric-value.cyan {
+      color: var(--cyan);
+    }
+
+    .metric-value.green {
+      color: var(--green);
+    }
+
+    .metric-value.yellow {
+      color: var(--yellow);
+    }
+
+    .metric-value.red {
+      color: var(--red);
+    }
+
+    .number-display {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0 16px;
+    }
+
+    .ball {
+      display: grid;
+      width: 50px;
+      height: 50px;
+      place-items: center;
+      border: 1px solid rgba(85, 232, 255, 0.55);
+      border-radius: 50%;
+      color: var(--text);
+      font-size: 1.1rem;
+      font-weight: 900;
+      background:
+        radial-gradient(circle at 35% 28%, rgba(255, 255, 255, 0.25), transparent 16%),
+        linear-gradient(145deg, #1c546a, #0a1d28);
+      box-shadow:
+        inset 0 0 18px rgba(85, 232, 255, 0.1),
+        0 6px 15px rgba(0, 0, 0, 0.25);
+    }
+
+    .ball.selected {
+      border-color: var(--yellow);
+      color: #fffce9;
+      background:
+        radial-gradient(circle at 35% 28%, rgba(255, 255, 255, 0.28), transparent 16%),
+        linear-gradient(145deg, #806421, #382a08);
+    }
+
+    .score-line {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin: 12px 0;
+    }
+
+    .score-value {
+      min-width: 84px;
+      color: var(--cyan);
+      font-size: 1.8rem;
+      font-weight: 900;
+      letter-spacing: -0.05em;
+    }
+
+    .score-bar {
+      height: 12px;
+      flex: 1;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.32);
+    }
+
+    .score-bar > span {
+      display: block;
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--red), var(--yellow), var(--green), var(--cyan));
+      transition: width 0.36s ease;
+    }
+
+    .input-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+    }
+
+    input,
+    select {
+      width: 100%;
+      min-height: 46px;
+      padding: 10px 11px;
+      border: 1px solid rgba(157, 181, 192, 0.28);
+      border-radius: 11px;
+      outline: none;
+      color: var(--text);
+      background: rgba(2, 9, 14, 0.52);
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 3px rgba(85, 232, 255, 0.12);
+    }
+
+    input::placeholder {
+      color: #6f8791;
+    }
+
+    .status {
+      min-height: 22px;
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .status.error {
+      color: var(--red);
+    }
+
+    .status.success {
+      color: var(--green);
+    }
+
+    .status.warning {
+      color: var(--yellow);
+    }
+
+    .number-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 8px;
+      max-height: 570px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .number-card {
+      min-width: 0;
+      padding: 9px 7px;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.17);
+      text-align: center;
+    }
+
+    .number-card.selected-card {
+      border-color: rgba(255, 227, 108, 0.82);
+      background: rgba(89, 68, 11, 0.28);
+    }
+
+    .number-card .number-top {
+      margin-bottom: 4px;
+      color: var(--cyan);
+      font-size: 1rem;
+      font-weight: 900;
+    }
+
+    .number-card .tiny {
+      display: block;
+      color: var(--muted);
+      font-size: 0.58rem;
+      line-height: 1.26;
+    }
+
+    .number-card .tiny strong {
+      color: var(--text);
+      font-size: 0.69rem;
+    }
+
+    .quick-reference {
+      margin-top: 14px;
+      padding: 13px;
+      border: 1px dashed rgba(85, 232, 255, 0.28);
+      border-radius: 12px;
+      background: rgba(2, 12, 18, 0.35);
+    }
+
+    .quick-reference h3 {
+      color: var(--cyan);
+    }
+
+    .summary-box {
+      padding: 16px;
+      border: 1px solid rgba(85, 232, 255, 0.26);
+      border-radius: 14px;
+      background: rgba(6, 22, 29, 0.62);
+    }
+
+    .risk-low {
+      color: var(--green);
+    }
+
+    .risk-moderate {
+      color: var(--yellow);
+    }
+
+    .risk-high,
+    .risk-very-high {
+      color: var(--red);
+    }
+
+    .alert {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 11px;
+      font-size: 0.9rem;
+    }
+
+    .alert-info {
+      border: 1px solid rgba(85, 232, 255, 0.22);
+      color: #bceff8;
+      background: rgba(35, 115, 137, 0.12);
+    }
+
+    .alert-warn {
+      border: 1px solid rgba(255, 227, 108, 0.24);
+      color: #fff1ac;
+      background: rgba(121, 89, 9, 0.14);
+    }
+
+    .alert-danger {
+      border: 1px solid rgba(255, 109, 126, 0.3);
+      color: #ffd3d9;
+      background: rgba(138, 24, 42, 0.16);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .advanced {
+      margin-top: 16px;
+      border-color: rgba(177, 140, 255, 0.34);
+    }
+
+    .advanced h2 {
+      color: #d2c1ff;
+    }
+
+    .sim-output,
+    .generated-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .generated-item {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.17);
+    }
+
+    .generated-item .generated-head {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .generated-mini-balls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .mini-ball {
+      display: grid;
+      width: 29px;
+      height: 29px;
+      place-items: center;
+      border: 1px solid rgba(85, 232, 255, 0.45);
+      border-radius: 50%;
+      color: var(--text);
+      font-size: 0.76rem;
+      font-weight: 900;
+      background: rgba(20, 75, 93, 0.56);
+    }
+
+    .verdict {
+      border-color: rgba(255, 227, 108, 0.36);
+      background:
+        radial-gradient(circle at 88% 7%, rgba(255, 227, 108, 0.12), transparent 28%),
+        linear-gradient(145deg, rgba(47, 46, 24, 0.6), rgba(11, 19, 25, 0.96));
+    }
+
+    .verdict-title {
+      margin-bottom: 0;
+      color: var(--yellow);
+      font-size: 1.5rem;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+    }
+
+    .verdict-label {
+      margin: 12px 0 4px;
+      color: var(--cyan);
+      font-size: 1.02rem;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+    }
+
+    .footer-note {
+      margin: 18px 0 0;
+      color: #77929d;
+      font-size: 0.78rem;
+      text-align: center;
+    }
+
+    @media (min-width: 680px) {
+      .grid-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .grid-3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .input-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .number-grid {
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+      }
+
+      .metric-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (min-width: 980px) {
+      .metric-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .number-grid {
+        grid-template-columns: repeat(8, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 420px) {
+      .app-shell {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+
+      .hero,
+      .panel {
+        padding: 15px;
+      }
+
+      .number-grid {
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 5px;
+      }
+
+      .number-card {
+        padding: 7px 3px;
+      }
+
+      .number-card .tiny {
+        font-size: 0.52rem;
+      }
+
+      .ball {
+        width: 43px;
+        height: 43px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="app-shell">
+    <header class="hero">
+      <div class="brand-row">
+        <div>
+          <p class="brand-kicker">PL 200 / Probability Intelligence</p>
+          <h1>Zuno — Lightning Strike Calculator</h1>
+          <p class="hero-copy">
+            A local 6/49 lottery analyzer that separates equal random draw odds
+            from human-selection behavior, split-risk considerations, and your
+            own budget-based decision rules.
+          </p>
+        </div>
+        <div class="bolt-badge" aria-hidden="true">⚡</div>
+      </div>
+
+      <div class="principle">
+        <div><strong>Zuno Principle:</strong> Zuno does not predict the lottery. Zuno separates randomness from decision quality.</div>
+        <div>Every valid 6-number combination has the same probability of being drawn. Determination Score measures human-selection characteristics, not drawing probability.</div>
+      </div>
+    </header>
+
+    <nav class="top-actions" aria-label="Primary actions">
+      <button class="btn btn-primary" id="quickPickButton">GENERATE QUICK PICK</button>
+      <button class="btn" id="scanButton">SCAN MY NUMBERS</button>
+      <button class="btn btn-warning" id="activateZunoButton">ACTIVATE ZUNO</button>
+    </nav>
+
+    <section class="grid grid-2">
+      <article class="panel highlight">
+        <div class="panel-head">
+          <div>
+            <h2>Quick Pick Reference</h2>
+            <p class="section-note">A cryptographically generated reference combination when supported by your browser.</p>
+          </div>
+        </div>
+
+        <div class="number-display" id="quickPickDisplay" aria-live="polite"></div>
+
+        <div class="score-line">
+          <div class="score-value" id="quickPickScore">—</div>
+          <div class="score-bar"><span id="quickPickBar"></span></div>
+        </div>
+
+        <div class="metric-grid">
+          <div class="metric">
+            <span class="metric-label">Quick Pick Score</span>
+            <span class="metric-value cyan" id="quickPickScoreLabel">Generate a pick</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Jackpot probability</span>
+            <span class="metric-value">1 in 13,983,816</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Human-selection bias</span>
+            <span class="metric-value" id="quickPickBias">—</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Split risk</span>
+            <span class="metric-value" id="quickPickRisk">—</span>
+          </div>
+        </div>
+
+        <div class="button-row" style="margin-top: 14px;">
+          <button class="btn btn-small" id="useQuickPickButton">USE QUICK PICK AS REFERENCE</button>
+        </div>
+      </article>
+
+      <article class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>My Numbers</h2>
+            <p class="section-note">Enter exactly six unique values from 1 through 49.</p>
+          </div>
+        </div>
+
+        <div class="input-grid" id="myNumbersInputs">
+          <div class="field"><label for="num1">Number 1</label><input id="num1" type="number" min="1" max="49" inputmode="numeric" placeholder="01" /></div>
+          <div class="field"><label for="num2">Number 2</label><input id="num2" type="number" min="1" max="49" inputmode="numeric" placeholder="02" /></div>
+          <div class="field"><label for="num3">Number 3</label><input id="num3" type="number" min="1" max="49" inputmode="numeric" placeholder="03" /></div>
+          <div class="field"><label for="num4">Number 4</label><input id="num4" type="number" min="1" max="49" inputmode="numeric" placeholder="04" /></div>
+          <div class="field"><label for="num5">Number 5</label><input id="num5" type="number" min="1" max="49" inputmode="numeric" placeholder="05" /></div>
+          <div class="field"><label for="num6">Number 6</label><input id="num6" type="number" min="1" max="49" inputmode="numeric" placeholder="06" /></div>
+        </div>
+
+        <div class="button-row" style="margin-top: 14px;">
+          <button class="btn btn-primary" id="scanButton2">SCAN MY NUMBERS</button>
+          <button class="btn btn-danger" id="clearNumbersButton">CLEAR</button>
+        </div>
+
+        <p class="status" id="numberInputStatus" aria-live="polite"></p>
+      </article>
+    </section>
+
+    <section class="panel" style="margin-top: 16px;">
+      <div class="panel-head">
+        <div>
+          <h2>Combination Determination</h2>
+          <p class="section-note">
+            This evaluates human-selection characteristics and potential jackpot-sharing exposure. It does not change the chance of the draw.
+          </p>
+        </div>
+      </div>
+
+      <div class="summary-box">
+        <h3 id="comboHeading">Scan a valid six-number combination</h3>
+        <div class="number-display" id="comboDisplay"></div>
+
+        <div class="score-line">
+          <div class="score-value" id="comboScore">—</div>
+          <div class="score-bar"><span id="comboBar"></span></div>
+        </div>
+
+        <div class="metric-grid" id="comboMetrics">
+          <div class="metric">
+            <span class="metric-label">True jackpot probability</span>
+            <span class="metric-value">1 in 13,983,816</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Probability advantage</span>
+            <span class="metric-value red">NONE</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Determination score</span>
+            <span class="metric-value cyan">Awaiting scan</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Split-risk estimate</span>
+            <span class="metric-value">Awaiting scan</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="alert alert-info">
+        Split-risk analysis does not affect your probability of hitting the winning combination. It estimates how likely the same combination may be selected by other players.
+      </div>
+    </section>
+
+    <section class="panel" style="margin-top: 16px;">
+      <div class="panel-head">
+        <div>
+          <h2>Number Determination</h2>
+          <p class="section-note">
+            All individual numbers have an equal chance of appearing in a 6/49 drawing: \\(6/49 \\approx 12.2449\\%\\).
+          </p>
+        </div>
+      </div>
+
+      <div class="alert alert-info">
+        <strong>Historical Frequency ≠ Future Probability.</strong> No historical, “hot,” “cold,” overdue, numerological, lunar, or pattern-based value changes a fair number’s true draw probability.
+      </div>
+
+      <div class="number-grid" id="numberGrid"></div>
+    </section>
+
+    <section class="panel highlight" style="margin-top: 16px;">
+      <div class="panel-head">
+        <div>
+          <h2>⚡ Lightning Strike Calculator</h2>
+          <p class="section-note">
+            A budget-aware opportunity model. Results are estimates based on the inputs and assumptions you choose.
+          </p>
+        </div>
+      </div>
+
+      <div class="input-grid">
+        <div class="field">
+          <label for="jackpotInput">Advertised Jackpot ($)</label>
+          <input id="jackpotInput" type="number" min="0" step="1000000" inputmode="decimal" placeholder="100000000" />
+        </div>
+
+        <div class="field">
+          <label for="cashValueInput">Cash Value ($)</label>
+          <input id="cashValueInput" type="number" min="0" step="100000" inputmode="decimal" placeholder="50000000" />
+        </div>
+
+        <div class="field">
+          <label for="ticketCostInput">Ticket Cost ($)</label>
+          <input id="ticketCostInput" type="number" min="0.01" step="0.01" inputmode="decimal" value="2" />
+        </div>
+
+        <div class="field">
+          <label for="ticketsSoldInput">Estimated Tickets Sold</label>
+          <input id="ticketsSoldInput" type="number" min="0" step="1000" inputmode="decimal" placeholder="10000000" />
+        </div>
+
+        <div class="field">
+          <label for="ticketsBuyInput">Tickets You Plan to Buy</label>
+          <input id="ticketsBuyInput" type="number" min="0" step="1" inputmode="numeric" value="1" />
+        </div>
+
+        <div class="field">
+          <label for="jackpotOddsInput">Jackpot Odds (1 in X)</label>
+          <input id="jackpotOddsInput" type="number" min="1" step="1" inputmode="decimal" value="13983816" />
+        </div>
+
+        <div class="field">
+          <label for="taxRateInput">Tax Rate (%)</label>
+          <input id="taxRateInput" type="number" min="0" max="100" step="0.1" inputmode="decimal" value="30" />
+        </div>
+
+        <div class="field">
+          <label for="estimatedWinnersInput">Estimated Jackpot Winners</label>
+          <input id="estimatedWinnersInput" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Optional: 1.2" />
+        </div>
+
+        <div class="field">
+          <label for="lowerTierEVInput">Lower-Tier EV / Ticket ($)</label>
+          <input id="lowerTierEVInput" type="number" min="0" step="0.01" inputmode="decimal" value="0" />
+        </div>
+
+        <div class="field">
+          <label for="budgetInput">Maximum Lottery Budget / Drawing ($)</label>
+          <input id="budgetInput" type="number" min="0" step="0.01" inputmode="decimal" value="10" />
+        </div>
+
+        <div class="field full">
+          <label for="splitModelToggle">Jackpot Split Model</label>
+          <select id="splitModelToggle">
+            <option value="estimate">Use MODEL ESTIMATE when inputs permit</option>
+            <option value="off">Do not model split estimate</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="button-row" style="margin-top: 14px;">
+        <button class="btn btn-primary" id="calculateLightningButton">CALCULATE LIGHTNING</button>
+      </div>
+
+      <p class="status" id="lightningStatus" aria-live="polite"></p>
+
+      <div class="grid grid-2" style="margin-top: 16px;">
+        <div class="summary-box">
+          <h3>Probability Engine</h3>
+          <div class="metric-grid">
+            <div class="metric">
+              <span class="metric-label">Single-ticket probability</span>
+              <span class="metric-value cyan" id="singleProbability">—</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Multi-ticket probability</span>
+              <span class="metric-value cyan" id="multiProbability">—</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Multi-ticket percent</span>
+              <span class="metric-value" id="multiPercent">—</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Ticket spend</span>
+              <span class="metric-value" id="ticketSpend">—</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Budget status</span>
+              <span class="metric-value" id="budgetStatus">—</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Split estimate</span>
+              <span class="metric-value" id="splitEstimate">—</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="summary-box">
+          <h3>Expected Value Engine</h3>
+          <div class="metric-grid">
+            <div class="metric">
+              <span class="metric-label">After-tax cash basis</span>
+              <span class="metric-value" id="afterTaxCash">—</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Expected jackpot contribution</span>
+              <span class="metric-value" id="expectedJackpot">—</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Lower-tier contribution</span>
+              <span class="metric-value" id="expectedLowerTier">—</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Estimated total EV</span>
+              <span class="metric-value" id="estimatedEV">—</span>
+            </div>
+          </div>
+
+          <div class="alert alert-warn" id="evAssumptions">
+            Enter valid inputs to view model assumptions.
+          </div>
+        </div>
+      </div>
+
+      <div class="summary-box" style="margin-top: 16px;">
+        <h3>⚡ Lightning Score</h3>
+        <div class="score-line">
+          <div class="score-value" id="lightningScore">—</div>
+          <div class="score-bar"><span id="lightningBar"></span></div>
+        </div>
+
+        <div class="metric-grid">
+          <div class="metric">
+            <span class="metric-label">Classification</span>
+            <span class="metric-value yellow" id="lightningClass">—</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Jackpot magnitude</span>
+            <span class="metric-value" id="scoreJackpot">—</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Cash value</span>
+            <span class="metric-value" id="scoreCash">—</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Expected value</span>
+            <span class="metric-value" id="scoreEV">—</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Split risk</span>
+            <span class="metric-value" id="scoreSplit">—</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Prize structure</span>
+            <span class="metric-value" id="scorePrize">—</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Cost efficiency</span>
+            <span class="metric-value" id="scoreCost">—</span>
+          </div>
+        </div>
+
+        <div class="alert alert-info">
+          A high Lightning Score does not mean a high probability of winning. It is an opportunity score using the user-defined economic and budget criteria below.
+        </div>
+      </div>
+    </section>
+
+    <section class="panel verdict" style="margin-top: 16px;">
+      <div class="panel-head">
+        <div>
+          <h2>Zuno Verdict</h2>
+          <p class="section-note">A decision summary, not a prediction or purchase recommendation.</p>
+        </div>
+      </div>
+
+      <div class="grid grid-3">
+        <div class="metric">
+          <span class="metric-label">⚡ Lightning score</span>
+          <span class="metric-value yellow" id="verdictLightning">—</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">🎯 True jackpot odds</span>
+          <span class="metric-value" id="verdictOdds">1 in 13,983,816</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">🧠 Combination determination</span>
+          <span class="metric-value cyan" id="verdictCombo">—</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">👥 Estimated split risk</span>
+          <span class="metric-value" id="verdictRisk">—</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">💰 Estimated EV</span>
+          <span class="metric-value" id="verdictEV">—</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">💵 Budget status</span>
+          <span class="metric-value" id="verdictBudget">—</span>
+        </div>
+      </div>
+
+      <p class="verdict-label" id="verdictLabel">AWAITING ANALYSIS</p>
+      <p class="score-explanation" id="verdictText">
+        Add a valid combination and Lightning Strike inputs to generate a transparent, budget-aware Zuno summary.
+      </p>
+    </section>
+
+    <section class="panel advanced hidden" id="advancedPanel">
+      <div class="panel-head">
+        <div>
+          <h2>Activated Zuno Analysis</h2>
+          <p class="section-note">
+            Advanced data illustrates distribution and selection structure. It does not produce a draw forecast.
+          </p>
+        </div>
+      </div>
+
+      <div class="grid grid-2">
+        <article class="summary-box">
+          <h3>Combination Intelligence</h3>
+          <div class="metric-grid">
+            <div class="metric">
+              <span class="metric-label">Combination entropy</span>
+              <span class="metric-value" id="entropyMetric">—</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Birthday bias</span>
+              <span class="metric-value" id="advancedBirthday">—</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Human-choice concentration</span>
+              <span class="metric-value" id="humanConcentration">—</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Distribution</span>
+              <span class="metric-value" id="advancedDistribution">—</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="summary-box">
+          <h3>Unique Combination Generator</h3>
+          <p class="section-note">Each generated row has the same true probability: 1 in 13,983,816.</p>
+          <div class="generator-controls" style="margin-top: 12px;">
+            <button class="btn btn-small" data-generate-count="1">GENERATE 1</button>
+            <button class="btn btn-small" data-generate-count="5">GENERATE 5</button>
+            <button class="btn btn-small" data-generate-count="10">GENERATE 10</button>
+          </div>
+          <div class="generated-list" id="generatedList"></div>
+        </article>
+      </div>
+
+      <article class="summary-box" style="margin-top: 16px;">
+        <h3>Monte Carlo Simulation</h3>
+        <p class="section-note">
+          Simulation illustrates probability; it does not predict the next drawing.
+        </p>
+
+        <div class="button-row" style="margin-top: 12px;">
+          <button class="btn btn-small" data-simulation-runs="10000">RUN 10,000</button>
+          <button class="btn btn-small" data-simulation-runs="100000">RUN 100,000</button>
+          <button class="btn btn-small" data-simulation-runs="1000000">RUN 1,000,000</button>
+        </div>
+
+        <p class="status" id="simulationStatus" aria-live="polite"></p>
+        <div class="sim-output" id="simulationOutput"></div>
+      </article>
+
+      <div class="alert alert-info" style="margin-top: 16px;">
+        Quick Pick randomly generates combinations. Zuno-selection analyzes combinations for human-selection characteristics. Neither changes the underlying probability of winning.
+      </div>
+    </section>
+
+    <p class="footer-note">
+      Zuno PL 200 runs locally in your browser. It is a mathematical and behavioral-analysis tool, not gambling advice or a prediction system.
+    </p>
+  </main>
+
+  <script>
+    "use strict";
+
+    /*
+      ZUNO PL 200 MATHEMATICAL SAFEGUARDS
+
+      1. A fair 6/49 draw has C(49, 6) = 13,983,816 possible combinations.
+      2. Every valid six-number combination therefore has exactly equal jackpot probability.
+      3. Determination Scores intentionally measure human-selection characteristics
+         such as birthday concentration, familiar numbers, and obvious patterns.
+      4. Lightning Score is an economic/budget opportunity model. It never changes
+         draw odds and cannot forecast a random drawing.
+    */
+
+    const TOTAL_COMBINATIONS = 13983816;
+    const NUMBER_DRAW_PROBABILITY = 6 / 49;
+    const MAX_NUMBER = 49;
+    const NUMBERS_PER_TICKET = 6;
+
+    const state = {
+      quickPick: [],
+      activeCombination: [],
+      generatedCombinations: [],
+      comboAnalysis: null,
+      lightning: null
+    };
+
+    const $ = (id) => document.getElementById(id);
+
+    function clamp(value, min, max) {
+      return Math.min(Math.max(value, min), max);
+    }
+
+    function formatNumber(value, decimals = 0) {
+      if (!Number.isFinite(value)) return "—";
+      return new Intl.NumberFormat("en-US", {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+      }).format(value);
+    }
+
+    function formatCurrency(value, decimals = 2) {
+      if (!Number.isFinite(value)) return "—";
+      const absolute = Math.abs(value);
+      const sign = value < 0 ? "-" : "";
+      return sign + new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+      }).format(absolute);
+    }
+
+    function formatPercent(value, decimals = 6) {
+      if (!Number.isFinite(value)) return "—";
+      return `${(value * 100).toFixed(decimals)}%`;
+    }
+
+    function formatOneIn(probability) {
+      if (!Number.isFinite(probability) || probability <= 0) return "—";
+      const reciprocal = 1 / probability;
+
+      if (reciprocal >= 1000) {
+        return `1 in ${formatNumber(reciprocal, 0)}`;
+      }
+
+      return `1 in ${reciprocal.toFixed(2)}`;
+    }
+
+    function padNumber(number) {
+      return String(number).padStart(2, "0");
+    }
+
+    function parseNonNegative(value, fallback = 0) {
+      const parsed = Number(value);
+      return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback;
+    }
+
+    function getSecureRandomInt(maxExclusive) {
+      if (!Number.isInteger(maxExclusive) || maxExclusive <= 0) {
+        throw new Error("Random range must be a positive integer.");
+      }
+
+      if (window.crypto && window.crypto.getRandomValues) {
+        const maxUint32 = 0x100000000;
+        const limit = maxUint32 - (maxUint32 % maxExclusive);
+        const buffer = new Uint32Array(1);
+
+        do {
+          window.crypto.getRandomValues(buffer);
+        } while (buffer[0] >= limit);
+
+        return buffer[0] % maxExclusive;
+      }
+
+      return Math.floor(Math.random() * maxExclusive);
+    }
+
+    function generateQuickPick() {
+      const pool = Array.from({ length: MAX_NUMBER }, (_, index) => index + 1);
+
+      for (let index = pool.length - 1; index > 0; index--) {
+        const randomIndex = getSecureRandomInt(index + 1);
+        [pool[index], pool[randomIndex]] = [pool[randomIndex], pool[index]];
+      }
+
+      return pool.slice(0, NUMBERS_PER_TICKET).sort((a, b) => a - b);
+    }
+
+    function calculateCombinationProbability() {
+      return 1 / TOTAL_COMBINATIONS;
+    }
+
+    function calculateMultiTicketProbability(ticketCount, odds = TOTAL_COMBINATIONS) {
+      /*
+        Exact complement formula:
+        P(at least one jackpot) = 1 - (1 - 1/odds)^N
+
+        This assumes entries are unique combinations. Duplicate tickets do not create
+        additional unique-combination coverage, though they would multiply a prize if
+        that duplicate itself wins.
+      */
+      const n = Math.max(0, Math.floor(ticketCount));
+      const validOdds = Math.max(1, odds);
+
+      if (n === 0) return 0;
+      if (n >= validOdds) return 1;
+
+      return 1 - Math.pow(1 - (1 / validOdds), n);
+    }
+
+    function isPopularFavorite(number) {
+      return [1, 3, 7, 11, 13, 17, 21, 23, 25, 27, 31, 33, 37, 42].includes(number);
+    }
+
+    function calculateNumberDetermination(number) {
+      /*
+        This produces a human-selection uniqueness signal only.
+        It does NOT affect true draw probability, which is exactly 6/49 for every
+        individual number in a fair 6/49 drawing.
+      */
+      let score = 50;
+      let birthdayBias = "High";
+      let humanSelection = "Average";
+      let patternBias = "Low";
+      const notes = [];
+
+      if (number >= 32) {
+        score += 25;
+        birthdayBias = "Low";
+        humanSelection = "Lower-than-average";
+        notes.push("outside common date range");
+      } else {
+        score -= 7;
+        notes.push("calendar-date compatible");
+      }
+
+      if (isPopularFavorite(number)) {
+        score -= 12;
+        notes.push("commonly favored");
+        humanSelection = number >= 32 ? "Average" : "Higher-than-average";
+      }
+
+      if (number <= 6 || number % 5 === 0 || number === 10 || number === 20 || number === 30 || number === 40) {
+        score -= 7;
+        patternBias = "Moderate";
+        notes.push("frequently used in simple patterns");
+      }
+
+      if (number === 49 || number === 47 || number === 46 || number === 43 || number === 41) {
+        score += 4;
+      }
+
+      score = clamp(Math.round(score), 0, 100);
+
+      return {
+        number,
+        score,
+        drawProbability: NUMBER_DRAW_PROBABILITY,
+        drawProbabilityLabel: "Equal",
+        humanSelection,
+        birthdayBias,
+        patternBias,
+        randomness: "CSPRNG eligible",
+        historicalFrequency: "No historical data loaded",
+        probabilityAdvantage: "NONE",
+        notes
+      };
+    }
+
+    function countConsecutivePairs(numbers) {
+      let pairs = 0;
+      for (let i = 1; i < numbers.length; i++) {
+        if (numbers[i] - numbers[i - 1] === 1) pairs++;
+      }
+      return pairs;
+    }
+
+    function longestConsecutiveRun(numbers) {
+      if (!numbers.length) return 0;
+
+      let current = 1;
+      let longest = 1;
+
+      for (let i = 1; i < numbers.length; i++) {
+        if (numbers[i] === numbers[i - 1] + 1) {
+          current++;
+          longest = Math.max(longest, current);
+        } else {
+          current = 1;
+        }
+      }
+
+      return longest;
+    }
+
+    function isArithmeticProgression(numbers) {
+      if (numbers.length < 3) return false;
+      const step = numbers[1] - numbers[0];
+      if (step <= 0) return false;
+
+      return numbers.every((number, index) => {
+        return index === 0 || number - numbers[index - 1] === step;
+      });
+    }
+
+    function countMultiples(numbers, base) {
+      return numbers.filter((number) => number % base === 0).length;
+    }
+
+    function calculateCombinationEntropy(numbers) {
+      /*
+        This is a descriptive normalized spread/variety metric. It is not Shannon
+        entropy of a prediction model and has no impact on lottery draw odds.
+      */
+      const sorted = [...numbers].sort((a, b) => a - b);
+      const unique = new Set(sorted).size;
+      const range = sorted[sorted.length - 1] - sorted[0];
+      const oddCount = sorted.filter((number) => number % 2 !== 0).length;
+      const lowCount = sorted.filter((number) => number <= 24).length;
+      const run = longestConsecutiveRun(sorted);
+
+      let score = 35;
+      score += (unique / NUMBERS_PER_TICKET) * 25;
+      score += (range / 48) * 20;
+      score += (1 - Math.abs(oddCount - 3) / 3) * 10;
+      score += (1 - Math.abs(lowCount - 3) / 3) * 10;
+      score -= Math.max(0, run - 2) * 6;
+
+      return clamp(Math.round(score), 0, 100);
+    }
+
+    function getPatternAnalysis(numbers) {
+      const sorted = [...numbers].sort((a, b) => a - b);
+      const longestRun = longestConsecutiveRun(sorted);
+      const pairCount = countConsecutivePairs(sorted);
+      const arithmetic = isArithmeticProgression(sorted);
+      const multiplesOf5 = countMultiples(sorted, 5);
+      const multiplesOf10 = countMultiples(sorted, 10);
+      const differences = [];
+
+      for (let i = 1; i < sorted.length; i++) {
+        differences.push(sorted[i] - sorted[i - 1]);
+      }
+
+      const duplicateGaps = differences.filter((gap, index) => {
+        return differences.indexOf(gap) !== index;
+      }).length;
+
+      const flags = [];
+
+      if (longestRun >= 4) flags.push(`long consecutive run (${longestRun})`);
+      else if (pairCount >= 2) flags.push(`${pairCount} consecutive pairs`);
+
+      if (arithmetic) flags.push("arithmetic progression");
+      if (multiplesOf10 >= 3) flags.push("multiple-of-10 concentration");
+      else if (multiplesOf5 >= 4) flags.push("multiple-of-5 concentration");
+
+      if (duplicateGaps >= 3 && !arithmetic) flags.push("repeating gap structure");
+
+      let penalty = 0;
+      penalty += Math.max(0, longestRun - 1) * 8;
+      penalty += arithmetic ? 22 : 0;
+      penalty += multiplesOf5 >= 4 ? 12 : 0;
+      penalty += multiplesOf10 >= 3 ? 8 : 0;
+      penalty += pairCount >= 3 ? 6 : 0;
+
+      let label = "Low";
+      if (penalty >= 34) label = "Very High";
+      else if (penalty >= 22) label = "High";
+      else if (penalty >= 10) label = "Moderate";
+
+      return {
+        penalty,
+        label,
+        flags,
+        consecutivePairs: pairCount,
+        longestRun,
+        arithmetic,
+        multiplesOf5,
+        multiplesOf10
+      };
+    }
+
+    function calculateSplitRisk(numbers, comboAnalysis) {
+      /*
+        Relative split-risk estimate only. Without observed ticket-selection data,
+        exact duplication probabilities cannot be known. This estimate therefore
+        uses transparent human-selection proxies rather than fabricated precision.
+      */
+      const birthdayCount = numbers.filter((number) => number <= 31).length;
+      const popularCount = numbers.filter(isPopularFavorite).length;
+      const patternPenalty = comboAnalysis.pattern.penalty;
+      const lowCount = numbers.filter((number) => number <= 24).length;
+      const highCount = NUMBERS_PER_TICKET - lowCount;
+
+      let riskPoints = 0;
+      riskPoints += birthdayCount * 7;
+      riskPoints += popularCount * 5;
+      riskPoints += patternPenalty;
+      riskPoints += lowCount >= 5 ? 8 : 0;
+      riskPoints += highCount === 0 ? 8 : 0;
+      riskPoints += comboAnalysis.lowHighImbalance >= 4 ? 4 : 0;
+
+      riskPoints = clamp(Math.round(riskPoints), 0, 100);
+
+      let label = "LOW";
+      if (riskPoints >= 68) label = "VERY HIGH";
+      else if (riskPoints >= 48) label = "HIGH";
+      else if (riskPoints >= 27) label = "MODERATE";
+      else if (riskPoints >= 15) label = "LOW–MODERATE";
+
+      return { points: riskPoints, label };
+    }
+
+    function calculateCombinationDetermination(numbers) {
+      const sorted = [...numbers].sort((a, b) => a - b);
+      const numberScores = sorted.map((number) => calculateNumberDetermination(number));
+      const numberScoreAverage = numberScores.reduce((sum, item) => sum + item.score, 0) / numberScores.length;
+
+      const birthdayCount = sorted.filter((number) => number <= 31).length;
+      const lowCount = sorted.filter((number) => number <= 24).length;
+      const highCount = sorted.length - lowCount;
+      const oddCount = sorted.filter((number) => number % 2 !== 0).length;
+      const evenCount = sorted.length - oddCount;
+      const pattern = getPatternAnalysis(sorted);
+
+      const lowHighImbalance = Math.abs(lowCount - highCount);
+      const oddEvenImbalance = Math.abs(oddCount - evenCount);
+      const range = sorted[sorted.length - 1] - sorted[0];
+      const clusteringPenalty = range <= 15 ? 16 : range <= 22 ? 8 : 0;
+
+      let score = 50;
+      score += (numberScoreAverage - 50) * 0.65;
+      score += (NUMBERS_PER_TICKET - birthdayCount) * 5;
+      score += lowHighImbalance <= 2 ? 5 : lowHighImbalance === 4 ? -2 : -6;
+      score += oddEvenImbalance <= 2 ? 4 : oddEvenImbalance === 4 ? -2 : -5;
+      score -= pattern.penalty;
+      score -= clusteringPenalty;
+
+      score = clamp(Math.round(score), 0, 100);
+
+      let humanSelectionBias = "Low";
+      if (score < 38) humanSelectionBias = "High";
+      else if (score < 56) humanSelectionBias = "Moderate";
+      else if (score < 72) humanSelectionBias = "Low–Moderate";
+
+      const analysis = {
+        numbers: sorted,
+        score,
+        numberScoreAverage: Math.round(numberScoreAverage),
+        birthdayCount,
+        lowCount,
+        highCount,
+        oddCount,
+        evenCount,
+        lowHighImbalance,
+        oddEvenImbalance,
+        range,
+        clustering: range <= 15 ? "High" : range <= 22 ? "Moderate" : "Low",
+        pattern,
+        humanSelectionBias,
+        entropy: calculateCombinationEntropy(sorted)
+      };
+
+      analysis.splitRisk = calculateSplitRisk(sorted, analysis);
+      return analysis;
+    }
+
+    function calculateExpectedValue(inputs, combinationAnalysis) {
+      /*
+        EV is a model estimate, not a guaranteed return.
+
+        The model uses:
+        - after-tax cash value if provided, otherwise after-tax advertised jackpot;
+        - a modeled jackpot share if an expected winner count is supplied;
+        - lower-tier EV entered by the user on a per-ticket basis;
+        - total ticket spend.
+
+        Since lottery prize structures differ, lower-tier EV remains a transparent
+        user input rather than being invented by the app.
+      */
+      const {
+        jackpot,
+        cashValue,
+        ticketCost,
+        ticketCount,
+        odds,
+        taxRate,
+        estimatedWinners,
+        lowerTierEV,
+        splitModelEnabled,
+        ticketsSold
+      } = inputs;
+
+      const singleProbability = 1 / odds;
+      const afterTaxBase = (cashValue > 0 ? cashValue : jackpot) * (1 - taxRate / 100);
+
+      let shareDivisor = 1;
+      let splitEstimateText = "Insufficient data for reliable split estimate.";
+      let modelUsed = false;
+
+      if (splitModelEnabled && estimatedWinners > 0) {
+        /*
+          If W represents expected other winners, expected share is approximated
+          as 1 / (1 + W). If it represents total winners including the user,
+          users can enter that total directly; this remains a transparent model.
+        */
+        shareDivisor = 1 + estimatedWinners;
+        splitEstimateText = `MODEL ESTIMATE: assumed average share of 1/${shareDivisor.toFixed(2)} based on ${estimatedWinners.toFixed(2)} estimated additional winner(s).`;
+        modelUsed = true;
+      } else if (splitModelEnabled && ticketsSold > 0 && combinationAnalysis) {
+        /*
+          A deliberately conservative proxy only. The application's relative split
+          risk is translated into an assumed additional-winner rate, then labeled
+          as a model estimate. It is not presented as observed player behavior.
+        */
+        const riskFactor = combinationAnalysis.splitRisk.points / 100;
+        const baselineOtherWinners = ticketsSold / odds;
+        const modeledOthers = baselineOtherWinners * (0.45 + riskFactor * 1.1);
+
+        if (modeledOthers > 0) {
+          shareDivisor = 1 + modeledOthers;
+          splitEstimateText = `MODEL ESTIMATE: approximately ${modeledOthers.toFixed(2)} additional winner(s), using tickets sold and relative human-selection split-risk assumptions.`;
+          modelUsed = true;
+        }
+      }
+
+      const effectiveJackpot = afterTaxBase / shareDivisor;
+      const expectedJackpotContribution = singleProbability * effectiveJackpot * ticketCount;
+      const expectedLowerTier = lowerTierEV * ticketCount;
+      const ticketSpend = ticketCost * ticketCount;
+      const totalEV = expectedJackpotContribution + expectedLowerTier - ticketSpend;
+
+      return {
+        singleProbability,
+        afterTaxBase,
+        shareDivisor,
+        splitEstimateText,
+        modelUsed,
+        effectiveJackpot,
+        expectedJackpotContribution,
+        expectedLowerTier,
+        ticketSpend,
+        totalEV
+      };
+    }
+
+    function calculateLightningScore(inputs, evResult, combinationAnalysis) {
+      /*
+        Score weights:
+        Jackpot Magnitude: 0–25
+        Cash Value:        0–20
+        Expected Value:    0–25
+        Split Risk:        0–15
+        Prize Structure:   0–10
+        Cost Efficiency:   0–5
+
+        This is a preference/decision model. It is explicitly not a probability.
+      */
+      const jackpotPoints = clamp((inputs.jackpot / 1000000000) * 25, 0, 25);
+      const cashPoints = clamp((inputs.cashValue / 600000000) * 20, 0, 20);
+
+      const evPerTicket = inputs.ticketCount > 0 ? evResult.totalEV / inputs.ticketCount : -inputs.ticketCost;
+      const evRatio = inputs.ticketCost > 0 ? evPerTicket / inputs.ticketCost : -1;
+      const evPoints = clamp((evRatio + 1) * 12.5, 0, 25);
+
+      const splitPoints = combinationAnalysis
+        ? clamp(15 - (combinationAnalysis.splitRisk.points * 0.15), 0, 15)
+        : 7;
+
+      const cashRatio = inputs.jackpot > 0 ? inputs.cashValue / inputs.jackpot : 0;
+      const prizeStructurePoints = clamp(cashRatio * 10, 0, 10);
+
+      const withinBudget = evResult.ticketSpend <= inputs.budget;
+      const budgetRatio = inputs.budget > 0 ? evResult.ticketSpend / inputs.budget : Infinity;
+      const costEfficiencyPoints = withinBudget
+        ? clamp(5 - Math.max(0, budgetRatio - 0.5) * 2, 2, 5)
+        : 0;
+
+      const total = clamp(
+        Math.round(
+          jackpotPoints +
+          cashPoints +
+          evPoints +
+          splitPoints +
+          prizeStructurePoints +
+          costEfficiencyPoints
+        ),
+        0,
+        100
+      );
+
+      let classification = "PASS";
+      if (total >= 90) classification = "LIGHTNING WATCH";
+      else if (total >= 75) classification = "STRONG OPPORTUNITY";
+      else if (total >= 60) classification = "INTERESTING";
+      else if (total >= 40) classification = "LOW OPPORTUNITY";
+
+      return {
+        total,
+        classification,
+        components: {
+          jackpot: jackpotPoints,
+          cash: cashPoints,
+          ev: evPoints,
+          split: splitPoints,
+          prize: prizeStructurePoints,
+          cost: costEfficiencyPoints
+        }
+      };
+    }
+
+    function riskClass(label) {
+      const normalized = String(label).toLowerCase().replaceAll("–", "-").replaceAll(" ", "-");
+      if (normalized.includes("very-high") || normalized === "high") return "risk-high";
+      if (normalized.includes("moderate")) return "risk-moderate";
+      return "risk-low";
+    }
+
+    function ballHTML(numbers, selected = false) {
+      return numbers.map((number) => {
+        return `<span class="ball${selected ? " selected" : ""}">${padNumber(number)}</span>`;
+      }).join("");
+    }
+
+    function miniBallHTML(numbers) {
+      return numbers.map((number) => {
+        return `<span class="mini-ball">${padNumber(number)}</span>`;
+      }).join("");
+    }
+
+    function renderNumberGrid() {
+      const activeSet = new Set(state.activeCombination);
+      $("numberGrid").innerHTML = Array.from({ length: MAX_NUMBER }, (_, index) => {
+        const number = index + 1;
+        const analysis = calculateNumberDetermination(number);
+        const selectedClass = activeSet.has(number) ? " selected-card" : "";
+
+        return `
+          <article class="number-card${selectedClass}">
+            <div class="number-top">${padNumber(number)}</div>
+            <span class="tiny">Draw: <strong>Equal</strong></span>
+            <span class="tiny">12.2449%</span>
+            <span class="tiny">Determination <strong>${analysis.score}/100</strong></span>
+            <span class="tiny">Human: ${analysis.humanSelection}</span>
+            <span class="tiny">Birthday: ${analysis.birthdayBias}</span>
+            <span class="tiny">Pattern: ${analysis.patternBias}</span>
+            <span class="tiny">Historical: N/A</span>
+            <span class="tiny">Advantage: <strong>NONE</strong></span>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function renderQuickPick() {
+      const pick = state.quickPick;
+
+      if (!pick.length) {
+        $("quickPickDisplay").innerHTML = "";
+        $("quickPickScore").textContent = "—";
+        $("quickPickScoreLabel").textContent = "Generate a pick";
+        $("quickPickBias").textContent = "—";
+        $("quickPickRisk").textContent = "—";
+        $("quickPickBar").style.width = "0%";
+        return;
+      }
+
+      const analysis = calculateCombinationDetermination(pick);
+      $("quickPickDisplay").innerHTML = ballHTML(pick);
+      $("quickPickScore").textContent = `${analysis.score}/100`;
+      $("quickPickScoreLabel").textContent = `${analysis.score}/100`;
+      $("quickPickBias").textContent = analysis.humanSelectionBias;
+      $("quickPickRisk").textContent = analysis.splitRisk.label;
+      $("quickPickRisk").className = `metric-value ${riskClass(analysis.splitRisk.label)}`;
+      $("quickPickBar").style.width = `${analysis.score}%`;
+    }
+
+    function renderCombinationAnalysis(analysis) {
+      if (!analysis) return;
+
+      state.comboAnalysis = analysis;
+      state.activeCombination = analysis.numbers;
+
+      $("comboHeading").textContent = `Combination: ${analysis.numbers.map(padNumber).join(" — ")}`;
+      $("comboDisplay").innerHTML = ballHTML(analysis.numbers, true);
+      $("comboScore").textContent = `${analysis.score}/100`;
+      $("comboBar").style.width = `${analysis.score}%`;
+
+      const patternDetails = analysis.pattern.flags.length
+        ? analysis.pattern.flags.join(", ")
+        : "No strong obvious structure detected";
+
+      $("comboMetrics").innerHTML = `
+        <div class="metric">
+          <span class="metric-label">True jackpot probability</span>
+          <span class="metric-value">1 in 13,983,816</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Probability advantage</span>
+          <span class="metric-value red">NONE</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Combination determination</span>
+          <span class="metric-value cyan">${analysis.score}/100</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Human selection bias</span>
+          <span class="metric-value">${analysis.humanSelectionBias}</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Birthday concentration</span>
+          <span class="metric-value">${analysis.birthdayCount}/6</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Low / High distribution</span>
+          <span class="metric-value">${analysis.lowCount} / ${analysis.highCount}</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Odd / Even</span>
+          <span class="metric-value">${analysis.oddCount} / ${analysis.evenCount}</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Clustering</span>
+          <span class="metric-value">${analysis.clustering}</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Pattern risk</span>
+          <span class="metric-value ${riskClass(analysis.pattern.label)}">${analysis.pattern.label}</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Potential jackpot split risk</span>
+          <span class="metric-value ${riskClass(analysis.splitRisk.label)}">${analysis.splitRisk.label}</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Consecutive structure</span>
+          <span class="metric-value">${analysis.pattern.consecutivePairs} pair(s); longest run ${analysis.pattern.longestRun}</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Pattern notes</span>
+          <span class="metric-value">${patternDetails}</span>
+        </div>
+      `;
+
+      $("verdictCombo").textContent = `${analysis.score}/100`;
+      $("verdictRisk").textContent = analysis.splitRisk.label;
+      $("verdictRisk").className = `metric-value ${riskClass(analysis.splitRisk.label)}`;
+
+      renderNumberGrid();
+      updateAdvancedAnalysis();
+    }
+
+    function readManualNumbers() {
+      const values = [1, 2, 3, 4, 5, 6].map((index) => {
+        return $("num" + index).value.trim();
+      });
+
+      if (values.some((value) => value === "")) {
+        return { error: "Enter all six numbers before scanning." };
+      }
+
+      const numbers = values.map(Number);
+
+      if (numbers.some((number) => !Number.isInteger(number))) {
+        return { error: "Each entry must be a whole number." };
+      }
+
+      if (numbers.some((number) => number < 1 || number > 49)) {
+        return { error: "Numbers must be between 1 and 49." };
+      }
+
+      if (new Set(numbers).size !== NUMBERS_PER_TICKET) {
+        return { error: "Duplicate numbers are not allowed. Enter six unique numbers." };
+      }
+
+      return { numbers: numbers.sort((a, b) => a - b) };
+    }
+
+    function setStatus(id, message = "", type = "") {
+      const element = $(id);
+      element.textContent = message;
+      element.className = `status${type ? " " + type : ""}`;
+    }
+
+    function runZunoScan() {
+      const result = readManualNumbers();
+
+      if (result.error) {
+        setStatus("numberInputStatus", result.error, "error");
+        return;
+      }
+
+      const analysis = calculateCombinationDetermination(result.numbers);
+      renderCombinationAnalysis(analysis);
+      setStatus(
+        "numberInputStatus",
+        "Zuno scan complete. Draw probability remains exactly equal to every other valid combination.",
+        "success"
+      );
+
+      if (state.lightning) {
+        calculateLightning();
+      }
+    }
+
+    function useQuickPickAsReference() {
+      if (!state.quickPick.length) {
+        state.quickPick = generateQuickPick();
+        renderQuickPick();
+      }
+
+      state.quickPick.forEach((number, index) => {
+        $("num" + (index + 1)).value = number;
+      });
+
+      setStatus("numberInputStatus", "Quick Pick loaded. Modify any values, then scan.", "success");
+      runZunoScan();
+      window.scrollTo({ top: $("myNumbersInputs").getBoundingClientRect().top + window.scrollY - 20, behavior: "smooth" });
+    }
+
+    function clearManualNumbers() {
+      [1, 2, 3, 4, 5, 6].forEach((index) => {
+        $("num" + index).value = "";
+      });
+
+      setStatus("numberInputStatus", "Manual entries cleared.");
+    }
+
+    function readLightningInputs() {
+      const jackpot = parseNonNegative($("jackpotInput").value);
+      const cashValue = parseNonNegative($("cashValueInput").value);
+      const ticketCost = Number($("ticketCostInput").value);
+      const ticketCount = Number($("ticketsBuyInput").value);
+      const odds = Number($("jackpotOddsInput").value);
+      const taxRate = Number($("taxRateInput").value);
+      const estimatedWinnersRaw = $("estimatedWinnersInput").value.trim();
+      const estimatedWinners = estimatedWinnersRaw === "" ? 0 : Number(estimatedWinnersRaw);
+      const lowerTierEV = parseNonNegative($("lowerTierEVInput").value);
+      const budget = parseNonNegative($("budgetInput").value);
+      const ticketsSold = parseNonNegative($("ticketsSoldInput").value);
+      const splitModelEnabled = $("splitModelToggle").value === "estimate";
+
+      const errors = [];
+
+      if (!Number.isFinite(jackpot) || jackpot <= 0) errors.push("Enter a jackpot greater than $0.");
+      if (!Number.isFinite(ticketCost) || ticketCost <= 0) errors.push("Enter a valid ticket cost greater than $0.");
+      if (!Number.isInteger(ticketCount) || ticketCount < 0) errors.push("Ticket count must be a whole number of 0 or more.");
+      if (!Number.isFinite(odds) || odds <= 0) errors.push("Jackpot odds must be a valid positive number.");
+      if (!Number.isFinite(taxRate) || taxRate < 0 || taxRate > 100) errors.push("Tax rate must be between 0% and 100%.");
+      if (!Number.isFinite(estimatedWinners) || estimatedWinners < 0) errors.push("Estimated winners cannot be negative.");
+      if (!Number.isFinite(cashValue) || cashValue < 0) errors.push("Cash value cannot be negative.");
+      if (!Number.isFinite(lowerTierEV) || lowerTierEV < 0) errors.push("Lower-tier EV cannot be negative.");
+      if (!Number.isFinite(budget) || budget < 0) errors.push("Maximum budget cannot be negative.");
+
+      return {
+        errors,
+        inputs: {
+          jackpot,
+          cashValue,
+          ticketCost,
+          ticketCount,
+          odds,
+          taxRate,
+          estimatedWinners,
+          lowerTierEV,
+          budget,
+          ticketsSold,
+          splitModelEnabled
+        }
+      };
+    }
+
+    function calculateLightning() {
+      const { errors, inputs } = readLightningInputs();
+
+      if (errors.length) {
+        setStatus("lightningStatus", errors.join(" "), "error");
+        return;
+      }
+
+      const analysis = state.comboAnalysis || (
+        state.quickPick.length
+          ? calculateCombinationDetermination(state.quickPick)
+          : null
+      );
+
+      const evResult = calculateExpectedValue(inputs, analysis);
+      const multiProbability = calculateMultiTicketProbability(inputs.ticketCount, inputs.odds);
+      const lightningScore = calculateLightningScore(inputs, evResult, analysis);
+      const budgetExceeded = evResult.ticketSpend > inputs.budget;
+
+      state.lightning = {
+        inputs,
+        evResult,
+        multiProbability,
+        lightningScore,
+        budgetExceeded
+      };
+
+      $("singleProbability").textContent = formatOneIn(evResult.singleProbability);
+      $("multiProbability").textContent = formatOneIn(multiProbability);
+      $("multiPercent").textContent = formatPercent(multiProbability, 8);
+      $("ticketSpend").textContent = formatCurrency(evResult.ticketSpend);
+      $("budgetStatus").textContent = budgetExceeded ? "YES — EXCEEDED" : "NO — WITHIN LIMIT";
+      $("budgetStatus").className = `metric-value ${budgetExceeded ? "red" : "green"}`;
+      $("splitEstimate").textContent = evResult.modelUsed
+        ? `Estimated 1/${evResult.shareDivisor.toFixed(2)} share`
+        : "Insufficient data";
+
+      $("afterTaxCash").textContent = formatCurrency(evResult.afterTaxBase);
+      $("expectedJackpot").textContent = formatCurrency(evResult.expectedJackpotContribution);
+      $("expectedLowerTier").textContent = formatCurrency(evResult.expectedLowerTier);
+      $("estimatedEV").textContent = formatCurrency(evResult.totalEV);
+      $("estimatedEV").className = `metric-value ${evResult.totalEV >= 0 ? "green" : "red"}`;
+
+      const cashBasis = inputs.cashValue > 0 ? "cash value" : "advertised jackpot because cash value was blank";
+      const comboRiskText = analysis
+        ? `Combination split-risk input: ${analysis.splitRisk.label}.`
+        : "No specific combination loaded, so split-risk scoring uses a neutral default.";
+
+      $("evAssumptions").textContent =
+        `Assumptions: EV uses after-tax ${cashBasis}; ${evResult.splitEstimateText} ` +
+        `Lower-tier EV is the user-entered ${formatCurrency(inputs.lowerTierEV)} per ticket. ` +
+        `${comboRiskText} This is a MODEL ESTIMATE, not a guarantee.`;
+
+      $("lightningScore").textContent = `${lightningScore.total}/100`;
+      $("lightningBar").style.width = `${lightningScore.total}%`;
+      $("lightningClass").textContent = lightningScore.classification;
+      $("scoreJackpot").textContent = `${lightningScore.components.jackpot.toFixed(1)} / 25`;
+      $("scoreCash").textContent = `${lightningScore.components.cash.toFixed(1)} / 20`;
+      $("scoreEV").textContent = `${lightningScore.components.ev.toFixed(1)} / 25`;
+      $("scoreSplit").textContent = `${lightningScore.components.split.toFixed(1)} / 15`;
+      $("scorePrize").textContent = `${lightningScore.components.prize.toFixed(1)} / 10`;
+      $("scoreCost").textContent = `${lightningScore.components.cost.toFixed(1)} / 5`;
+
+      renderVerdict(analysis, state.lightning);
+      updateAdvancedAnalysis();
+
+      const statusText = budgetExceeded
+        ? "Calculation complete. PASS — exceeds your predefined budget."
+        : "Lightning calculations complete. Review assumptions before making any personal decision.";
+
+      setStatus("lightningStatus", statusText, budgetExceeded ? "warning" : "success");
+    }
+
+    function renderVerdict(analysis, lightning) {
+      const { inputs, evResult, lightningScore, budgetExceeded } = lightning;
+
+      $("verdictLightning").textContent = `${lightningScore.total}/100`;
+      $("verdictOdds").textContent = `1 in ${formatNumber(inputs.odds, 0)}`;
+      $("verdictCombo").textContent = analysis ? `${analysis.score}/100` : "No scan";
+      $("verdictRisk").textContent = analysis ? analysis.splitRisk.label : "Not analyzed";
+      $("verdictEV").textContent = formatCurrency(evResult.totalEV);
+      $("verdictEV").className = `metric-value ${evResult.totalEV >= 0 ? "green" : "red"}`;
+      $("verdictBudget").textContent = budgetExceeded ? "EXCEEDS LIMIT" : "WITHIN LIMIT";
+      $("verdictBudget").className = `metric-value ${budgetExceeded ? "red" : "green"}`;
+
+      let verdict = "PASS";
+      let explanation = "";
+
+      if (budgetExceeded) {
+        verdict = "PASS — EXCEEDS PREDEFINED BUDGET";
+        explanation =
+          `Your planned spend of ${formatCurrency(evResult.ticketSpend)} exceeds your stated ${formatCurrency(inputs.budget)} per-drawing limit. ` +
+          `The jackpot size does not change the budget rule, and the true jackpot odds remain ${formatOneIn(1 / inputs.odds)} per ticket.`;
+      } else if (lightningScore.total >= 90) {
+        verdict = "LIGHTNING WATCH";
+        explanation =
+          `The current inputs produce a high relative opportunity score under your chosen economic assumptions, while your spend remains within budget. ` +
+          `That does not make the draw predictable or materially likely to be won.`;
+      } else if (lightningScore.total >= 75) {
+        verdict = "STRONG OPPORTUNITY — OPTIONAL PLAY";
+        explanation =
+          `Relative jackpot, cash-value, split-risk, and budget inputs score strongly in this model. ` +
+          `Even so, every valid 6-number combination retains exactly the same random jackpot probability.`;
+      } else if (lightningScore.total >= 60) {
+        verdict = "INTERESTING — OPTIONAL PLAY";
+        explanation =
+          `The opportunity model is relatively favorable under your selected criteria and remains within budget. ` +
+          `The estimated EV of ${formatCurrency(evResult.totalEV)} and the equal draw odds should remain central to the decision.`;
+      } else if (lightningScore.total >= 40) {
+        verdict = "WEAK OPPORTUNITY";
+        explanation =
+          `The lottery has some favorable inputs under this scoring framework, but not enough to rate strongly against your selected criteria. ` +
+          `A lower human-selection split risk does not improve the probability of matching the drawing.`;
+      } else {
+        verdict = "PASS";
+        explanation =
+          `The economic, expected-value, cost, or split-risk assumptions do not create a compelling result under the current Zuno settings. ` +
+          `A different number combination would not alter the true draw odds.`;
+      }
+
+      $("verdictLabel").textContent = verdict;
+      $("verdictText").textContent = explanation;
+    }
+
+    function updateAdvancedAnalysis() {
+      if ($("advancedPanel").classList.contains("hidden")) return;
+
+      const analysis = state.comboAnalysis;
+
+      if (!analysis) {
+        $("entropyMetric").textContent = "Scan a combination";
+        $("advancedBirthday").textContent = "—";
+        $("humanConcentration").textContent = "—";
+        $("advancedDistribution").textContent = "—";
+        return;
+      }
+
+      $("entropyMetric").textContent = `${analysis.entropy}/100 descriptive`;
+      $("advancedBirthday").textContent = `${analysis.birthdayCount}/6 date-compatible`;
+      $("humanConcentration").textContent = `${analysis.splitRisk.points}/100 relative`;
+      $("advancedDistribution").textContent = `Low/High ${analysis.lowCount}/${analysis.highCount}; Odd/Even ${analysis.oddCount}/${analysis.evenCount}`;
+    }
+
+    function activateZuno() {
+      const panel = $("advancedPanel");
+      panel.classList.remove("hidden");
+      $("activateZunoButton").textContent = "ZUNO ACTIVE";
+      $("activateZunoButton").classList.remove("btn-warning");
+      $("activateZunoButton").classList.add("btn-primary");
+      updateAdvancedAnalysis();
+      panel.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function generateUniqueCombinations(count) {
+      const combinations = [];
+      const seen = new Set(state.generatedCombinations.map((numbers) => numbers.join("-")));
+
+      while (combinations.length < count) {
+        const combination = generateQuickPick();
+        const key = combination.join("-");
+
+        if (!seen.has(key)) {
+          seen.add(key);
+          combinations.push(combination);
+        }
+      }
+
+      state.generatedCombinations = combinations;
+      renderGeneratedCombinations();
+    }
+
+    function renderGeneratedCombinations() {
+      const container = $("generatedList");
+
+      if (!state.generatedCombinations.length) {
+        container.innerHTML = "";
+        return;
+      }
+
+      container.innerHTML = state.generatedCombinations.map((numbers, index) => {
+        const analysis = calculateCombinationDetermination(numbers);
+
+        return `
+          <article class="generated-item">
+            <div class="generated-head">
+              <div class="generated-mini-balls">${miniBallHTML(numbers)}</div>
+              <button class="btn btn-small btn-primary" data-select-generated="${index}">SELECT</button>
+            </div>
+            <div class="metric-grid">
+              <div class="metric">
+                <span class="metric-label">True probability</span>
+                <span class="metric-value">1 in 13,983,816</span>
+              </div>
+              <div class="metric">
+                <span class="metric-label">Determination</span>
+                <span class="metric-value cyan">${analysis.score}/100</span>
+              </div>
+              <div class="metric">
+                <span class="metric-label">Split risk</span>
+                <span class="metric-value ${riskClass(analysis.splitRisk.label)}">${analysis.splitRisk.label}</span>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      container.querySelectorAll("[data-select-generated]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const index = Number(button.dataset.selectGenerated);
+          const selection = state.generatedCombinations[index];
+
+          selection.forEach((number, inputIndex) => {
+            $("num" + (inputIndex + 1)).value = number;
+          });
+
+          runZunoScan();
+          window.scrollTo({ top: $("myNumbersInputs").getBoundingClientRect().top + window.scrollY - 20, behavior: "smooth" });
+        });
+      });
+    }
+
+    function runMonteCarlo(draws) {
+      /*
+        Monte Carlo is intentionally presented as a demonstration of long-run
+        distribution. It cannot identify which number or combination comes next.
+      */
+      const status = $("simulationStatus");
+      const output = $("simulationOutput");
+
+      status.textContent = `Running ${formatNumber(draws)} simulated 6/49 drawings locally…`;
+      status.className = "status warning";
+      output.innerHTML = "";
+
+      setTimeout(() => {
+        const frequencies = Array(MAX_NUMBER).fill(0);
+        const target = state.activeCombination.length === 6
+          ? state.activeCombination.join("-")
+          : null;
+
+        let targetHits = 0;
+
+        for (let draw = 0; draw < draws; draw++) {
+          const combination = generateQuickPick();
+
+          for (const number of combination) {
+            frequencies[number - 1]++;
+          }
+
+          if (target && combination.join("-") === target) {
+            targetHits++;
+          }
+        }
+
+        const expectedFrequency = draws * NUMBER_DRAW_PROBABILITY;
+        const maxFrequency = Math.max(...frequencies);
+        const minFrequency = Math.min(...frequencies);
+        const maxNumber = frequencies.indexOf(maxFrequency) + 1;
+        const minNumber = frequencies.indexOf(minFrequency) + 1;
+        const expectedJackpotHits = target ? draws / TOTAL_COMBINATIONS : 0;
+
+        output.innerHTML = `
+          <div class="metric-grid">
+            <div class="metric">
+              <span class="metric-label">Simulated drawings</span>
+              <span class="metric-value cyan">${formatNumber(draws)}</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Expected appearances / number</span>
+              <span class="metric-value">${formatNumber(expectedFrequency, 2)}</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Highest observed frequency</span>
+              <span class="metric-value">${padNumber(maxNumber)}: ${formatNumber(maxFrequency)}</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Lowest observed frequency</span>
+              <span class="metric-value">${padNumber(minNumber)}: ${formatNumber(minFrequency)}</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Selected combo hits</span>
+              <span class="metric-value">${target ? formatNumber(targetHits) : "No combination selected"}</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Expected selected combo hits</span>
+              <span class="metric-value">${target ? expectedJackpotHits.toFixed(6) : "—"}</span>
+            </div>
+          </div>
+          <div class="alert alert-info">
+            Observed frequencies fluctuate randomly around their expected levels. A short-run high or low result does not produce predictive information about the next drawing.
+          </div>
+        `;
+
+        status.textContent = `Simulation complete: ${formatNumber(draws)} drawings.`;
+        status.className = "status success";
+      }, 30);
+    }
+
+    function initialize() {
+      renderNumberGrid();
+
+      state.quickPick = generateQuickPick();
+      renderQuickPick();
+
+      $("quickPickButton").addEventListener("click", () => {
+        state.quickPick = generateQuickPick();
+        renderQuickPick();
+      });
+
+      $("useQuickPickButton").addEventListener("click", useQuickPickAsReference);
+      $("scanButton").addEventListener("click", runZunoScan);
+      $("scanButton2").addEventListener("click", runZunoScan);
+      $("clearNumbersButton").addEventListener("click", clearManualNumbers);
+      $("calculateLightningButton").addEventListener("click", calculateLightning);
+      $("activateZunoButton").addEventListener("click", activateZuno);
+
+      document.querySelectorAll("[data-generate-count]").forEach((button) => {
+        button.addEventListener("click", () => {
+          generateUniqueCombinations(Number(button.dataset.generateCount));
+        });
+      });
+
+      document.querySelectorAll("[data-simulation-runs]").forEach((button) => {
+        button.addEventListener("click", () => {
+          runMonteCarlo(Number(button.dataset.simulationRuns));
+        });
+      });
+
+      [1, 2, 3, 4, 5, 6].forEach((index) => {
+        $("num" + index).addEventListener("keydown", (event) => {
+          if (event.key === "Enter") runZunoScan();
+        });
+      });
+
+      $("ticketCostInput").addEventListener("change", calculateLightning);
+      $("ticketsBuyInput").addEventListener("change", calculateLightning);
+      $("budgetInput").addEventListener("change", calculateLightning);
+    }
+
+    initialize();
+  </script>
+</body>
+</html>
